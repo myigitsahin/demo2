@@ -138,6 +138,42 @@
             </table>
         </div>
     </div>
+    <div class="row">
+        <form action="/average" method="post" name="Transaction_Average" class="transaction-average">
+            <h3 class="form-signin-heading">Java 8 Features: Bulk Data Operations on Collections,  Lambda Expressions</h3>
+            <input type="hidden" name="postForm" value="172" />
+            <div class='col-md-5'>
+                <div class="form-group">
+                    <label for="datetimepicker8">From Date:</label>
+                    <div class='input-group date' id='datetimepicker8'>
+                        <input type='text' name="fromDate" class="form-control" />
+                        <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+                    </div>
+                </div>
+            </div>
+            <div class='col-md-5'>
+                <div class="form-group">
+                    <label for="datetimepicker9">To Date:</label>
+                    <div class='input-group date' id='datetimepicker9'>
+                        <input type='text' name="toDate" class="form-control" />
+                        <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+                    </div>
+                </div>
+
+            </div>
+            <div class='col-md-5'>
+                <button class="btn btn-lg btn-primary btn-block"  name="Submit" value="Transaction" type="Submit">Get Average Total from TransactionReport</button></div>
+        </form>
+        <div  class='col-md-2' id="response_result">
+            <p class="average" style="font-size:28px;">
+                result
+            </p>
+        </div>
+    </div>
 
 </div>
 <script src="js/jquery.min.js"></script>
@@ -164,11 +200,6 @@
                     tpl.find(".total").html(row.total);
                     tpl.find(".currency").html(row.currency);
                 });
-                /*if (msg.indexOf("success") != -1) {
-                    jQuery(".transaction-report").html(msg);
-                    return;
-                }
-                jQuery(".response-output").html(msg);*/
             }).always(function(msg) {
 
             });
@@ -219,6 +250,27 @@
                 tpl.find(".c_firstname").html(result.customerInfo.billingFirstName);
                 tpl.find(".c_lastname").html(result.customerInfo.billingLastName);
 
+            }).always(function(msg) {
+
+            });
+        });
+        jQuery(".transaction-average").on("submit", function(e) {
+            e.preventDefault();
+            jQuery.ajax({
+                url : '/average',
+                method : 'post',
+                data : jQuery(this).serialize()
+            }).done(function(result) {
+                if (!result) {
+                    alert("An error occured");
+                    return;
+                }
+
+                var tpl = jQuery("#response_result").clone();
+                tpl.attr("id", "");
+                tpl.removeClass("hidden");
+                tpl.insertAfter(jQuery("#response_result"));
+                tpl.find(".average").html(result.asDouble);
             }).always(function(msg) {
 
             });

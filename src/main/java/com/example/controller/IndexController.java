@@ -11,7 +11,8 @@ import org.springframework.ui.Model;
 /**
  * Created by Yigit Sahin on 18.3.2017.
  */
-
+import com.example.model.TransactionReportResponse;
+import com.example.model.TransactionReport;
 import org.springframework.util.Assert;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,6 +20,9 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.apache.coyote.http11.Constants.a;
 
 
 @Controller
@@ -43,11 +47,10 @@ public class IndexController {
         if (u.getStatus().equals("APPROVED")) {
             httpSession = u;
         }
-        //ResponseEntity<String> s = restTemplate.postForEntity("https://testreportingapi.clearsettle.com/api/v3/merchant/user/login", httpEntity, String.class, vars);
-        //System.out.println(s);
         model.addAttribute("name", u.getToken());
         return "index";
     }
+    //login unit test incomplete
     @Test
     public void testLogin( String email, String pass ) throws Exception {
         RestTemplate restTemplate = new RestTemplate();
@@ -56,12 +59,12 @@ public class IndexController {
         vars.put("password", pass);
         HttpHeaders requestHeaders = new HttpHeaders();
         HttpEntity<?> httpEntity = new HttpEntity<Object>(vars, requestHeaders);
-        restTemplate.postForObject("https://testreportingapi.clearsettle.com/api/v3/merchant/user/login", httpEntity, User.class, vars);
-        
+        User u =restTemplate.postForObject("https://testreportingapi.clearsettle.com/api/v3/merchant/user/login", httpEntity, User.class, vars);
+        Assert.isNull(u, "Incorrect email or password");
+
     }
 
     @RequestMapping("/list")
-    //@ResponseBody
     public String list(
                        @RequestParam(value="fromDate", required=false, defaultValue="password") String fromDate,
                        @RequestParam(value="toDate", required=false, defaultValue="password") String toDate,  Model model)
@@ -102,22 +105,25 @@ public class IndexController {
 
     }
 
-/*
-    @RequestMapping("/json")
-    public @ResponseBody
-    List json() {
-        ArrayList<User> a = new ArrayList<User>();
-        a.add(new User("Emre", "online", 34));
-        a.add(new User("Yiğit", "offline", 31));
+    // some of new java 8 features Bulk Data Operations on Collections, Lambda Expressions
+    @RequestMapping("/average")
+    public @ResponseBody  OptionalDouble average(
+            @RequestParam(value="fromDate", required=false, defaultValue="password") String fromDate,
+            @RequestParam(value="toDate", required=false, defaultValue="password") String toDate,  Model model)
+    {
 
-        OptionalDouble b = a.stream()
-                .map(User -> User.getAge())
+        service aas= new service();
+        TransactionReportResponse av = new TransactionReportResponse();
+        av = aas.getTransactionList(fromDate, toDate, httpSession.getToken()).getBody();
+        List<TransactionReport> a = new ArrayList<TransactionReport>();
+        a= av.getReports();
+        OptionalDouble b =  a.stream()
+                .map(TransactionReport -> TransactionReport.getTotal())
                 .mapToInt(Integer::intValue)
                 .average();
 
-        System.out.println(b);
+        return b;
 
-        return a.stream()
-                .filter(f -> f.getStatus().equals("offline")).collect(Collectors.toList());
-    }*/
+    }
+
 }
