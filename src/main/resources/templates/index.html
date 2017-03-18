@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" content="text/html; charset=UTF-8" />
+    <title>Yigit Sahin: Homework</title>
+    <link rel="stylesheet" href="css/bootstrap.css" />
+    <link rel="stylesheet" href="css/bootstrap-datetimepicker.min.css"/>
+
+</head>
+<body>
+<div class="container">
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <p style="word-wrap:break-word;" th:text="'your token is, ' + ${name} + '!'" />
+                </div>
+                <div class="panel-body">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <form action="/tlist" method="post" name="Transaction_Report" class="transaction-report">
+            <h3 class="form-signin-heading">2nd Endpoint: Transaction Report</h3>
+            <input type="hidden" name="postForm" value="172" />
+            <div class='col-md-5'>
+                <div class="form-group">
+                    <label for="datetimepicker6">From Date:</label>
+                    <div class='input-group date' id='datetimepicker6'>
+                        <input type='text' name="fromDate" class="form-control" />
+                        <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+                    </div>
+                </div>
+            </div>
+            <div class='col-md-5'>
+                <div class="form-group">
+                    <label for="datetimepicker7">To Date:</label>
+                    <div class='input-group date' id='datetimepicker7'>
+                        <input type='text' name="toDate" class="form-control" />
+                        <span class="input-group-addon">
+                    <span class="glyphicon glyphicon-calendar"></span>
+                </span>
+                    </div>
+                </div>
+
+            </div>
+            <div class='col-md-5'>
+            <button class="btn btn-lg btn-primary btn-block"  name="Submit" value="Transaction" type="Submit">Get Report</button></div>
+        </form>
+        <div class="response-output">
+
+        </div>
+        </div>
+        <div class='col-md-12' style="padding-top: 20px;">
+        <table class="row"  border="1" style="width:100%;">
+            <thead>
+            <tr>
+
+                <th scope="col">Count</th>
+                <th scope="col">Total</th>
+                <th scope="col">Currency</th>
+            </tr>
+            </thead>
+
+        <tr class="group row hidden" id="report_row">
+            <td class="count"></td>
+            <td class="total"></td>
+            <td class="currency"></td>
+        </tr>
+        </table>
+        </div>
+    <div class="row">
+        <form action="/transaction" method="post" name="Transaction" class="transaction">
+            <h3 class="form-signin-heading">3rd End Point: Get Transaction Customer Detail</h3>
+            <input type="hidden" name="postForm" value="174" />
+            <div class='col-md-5'>
+                <div class="form-group">
+                    <label>Transaction ID</label>
+                        <input type='text' name="transactionID" placeholder="875131-1489758721-3" value="875131-1489758721-3" class="form-control" />
+                </div>
+            </div>
+            <div class='col-md-5' style="padding-top: 14px;" >
+                <button class="btn btn-lg btn-primary btn-block"   name="Submit" value="Transaction" type="Submit">Get Customer Detail</button></div>
+        </form>
+        <div class='col-md-12' style="padding-top: 20px;">
+            <table class="row"  border="1" style="width:100%;">
+                <thead>
+                <tr>
+
+                    <th scope="col">Number</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">BillingFirstName</th>
+                    <th scope="col">BillingLastName</th>
+                </tr>
+                </thead>
+
+                <tr class="group row hidden" id="transaction_row">
+                    <td class="c_number"></td>
+                    <td class="c_email"></td>
+                    <td class="c_billingfirstname"></td>
+                    <td class="c_billinglastname"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div class="row">
+        <form action="/client" method="post" name="client_transaction" class="client_transaction">
+            <h3 class="form-signin-heading">4th End Point: Get Client</h3>
+            <input type="hidden" name="postForm" value="174" />
+            <div class='col-md-5'>
+                <div class="form-group">
+                    <label>Transaction ID</label>
+                    <input type='text' name="transactionID" placeholder="875131-1489758721-3" value="875131-1489758721-3" class="form-control" />
+                </div>
+            </div>
+            <div class='col-md-5' style="padding-top: 14px;">
+                <button class="btn btn-lg btn-primary btn-block"   name="Submit" value="Transaction" type="Submit">Get Client</button></div>
+        </form>
+        <div class='col-md-12' style="padding-top: 20px;">
+            <table class="row"  border="1" style="width:100%;">
+                <thead>
+                <tr>
+
+                    <th scope="col">ID</th>
+                    <th scope="col">FirstName</th>
+                    <th scope="col">LastName</th>
+                </tr>
+                </thead>
+
+                <tr class="group row hidden" id="client_row">
+                    <td class="c_id"></td>
+                    <td class="c_firstname"></td>
+                    <td class="c_lastname"></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+
+</div>
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        jQuery(".transaction-report").on("submit", function(e) {
+            e.preventDefault();
+            jQuery.ajax({
+                url : '/tlist',
+                method : 'post',
+                data : jQuery(this).serialize()
+            }).done(function(result) {
+                if (!result || typeof result.response === "undefined" || result.status !== "APPROVED") {
+                    alert("An error occured");
+                    return;
+                }
+                result.response.forEach(function(row) {
+                    var tpl = jQuery("#report_row").clone();
+                    tpl.attr("id", "");
+                    tpl.removeClass("hidden");
+                    tpl.insertAfter(jQuery("#report_row"));
+                    tpl.find(".count").html(row.count);
+                    tpl.find(".total").html(row.total);
+                    tpl.find(".currency").html(row.currency);
+                });
+                /*if (msg.indexOf("success") != -1) {
+                    jQuery(".transaction-report").html(msg);
+                    return;
+                }
+                jQuery(".response-output").html(msg);*/
+            }).always(function(msg) {
+
+            });
+        });
+
+        jQuery(".transaction").on("submit", function(e) {
+            e.preventDefault();
+            jQuery.ajax({
+                url : '/transaction',
+                method : 'post',
+                data : jQuery(this).serialize()
+            }).done(function(result) {
+                if (!result) {
+                    alert("An error occured");
+                    return;
+                }
+
+                    var tpl = jQuery("#transaction_row").clone();
+                    tpl.attr("id", "");
+                    tpl.removeClass("hidden");
+                    tpl.insertAfter(jQuery("#transaction_row"));
+                    tpl.find(".c_number").html(result.customerInfo.number);
+                    tpl.find(".c_email").html(result.customerInfo.email);
+                    tpl.find(".c_billingfirstname").html(result.customerInfo.billingFirstName);
+                    tpl.find(".c_billinglastname").html(result.customerInfo.billingLastName);
+
+            }).always(function(msg) {
+
+            });
+        });
+        jQuery(".client_transaction").on("submit", function(e) {
+            e.preventDefault();
+            jQuery.ajax({
+                url : '/client',
+                method : 'post',
+                data : jQuery(this).serialize()
+            }).done(function(result) {
+                if (!result) {
+                    alert("An error occured");
+                    return;
+                }
+
+                var tpl = jQuery("#client_row").clone();
+                tpl.attr("id", "");
+                tpl.removeClass("hidden");
+                tpl.insertAfter(jQuery("#client_row"));
+                tpl.find(".c_id").html(result.customerInfo.id);
+                tpl.find(".c_firstname").html(result.customerInfo.billingFirstName);
+                tpl.find(".c_lastname").html(result.customerInfo.billingLastName);
+
+            }).always(function(msg) {
+
+            });
+        });
+    });
+</script>
+<script src="js/moment.min.js"></script>
+<script src="js/bootstrap-datetimepicker.min.js"></script>
+<script type="text/javascript">
+    jQuery('#datetimepicker6').datetimepicker({
+        format: 'YYYY-MM-DD'
+    });
+    jQuery('#datetimepicker7').datetimepicker({
+        format: 'YYYY-MM-DD'
+    });
+    jQuery(function () {
+        jQuery('#datetimepicker6').datetimepicker();
+        jQuery('#datetimepicker7').datetimepicker({
+            useCurrent: false
+        });
+        jQuery("#datetimepicker6").on("dp.change", function (e) {
+            jQuery('#datetimepicker7').data("DateTimePicker").minDate(e.date);
+        });
+        jQuery("#datetimepicker7").on("dp.change", function (e) {
+            jQuery('#datetimepicker6').data("DateTimePicker").maxDate(e.date);
+        });
+    });
+    jQuery('#datetimepicker8').datetimepicker({
+        format: 'YYYY-MM-DD'
+    });
+    jQuery('#datetimepicker9').datetimepicker({
+        format: 'YYYY-MM-DD'
+    });
+    jQuery(function () {
+        jQuery('#datetimepicker8').datetimepicker();
+        jQuery('#datetimepicker9').datetimepicker({
+            useCurrent: false
+        });
+        jQuery("#datetimepicker8").on("dp.change", function (e) {
+            jQuery('#datetimepicker9').data("DateTimePicker").minDate(e.date);
+        });
+        jQuery("#datetimepicker9").on("dp.change", function (e) {
+            jQuery('#datetimepicker8').data("DateTimePicker").maxDate(e.date);
+        });
+    });
+</script>
+</body>
+</html>

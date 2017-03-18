@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" content="text/html; charset=UTF-8" />
+    <title>Yigit Sahin: Login</title>
+    <link rel="stylesheet" href="css/bootstrap.css" />
+
+</head>
+<body>
+<div class = "container">
+    <div class="wrapper">
+        <div class="col-md-3">
+        <form action="/index" method="post" name="Login_Form" class="form-signin">
+            <h3 class="form-signin-heading">1st End Point: Merchant Login</h3>
+            <h2 class="form-signin-heading">Please Sign In</h2>
+            <input type="hidden" name="postForm" value="171" />
+            <input type="text" class="form-control" name="email" placeholder="Email" required="required" autofocus="" />
+            <input type="password" class="form-control" name="pass" placeholder="Password" required="required"/>
+
+            <button class="btn btn-lg btn-primary btn-block"  name="Submit" value="Login" type="Submit">Login</button>
+        </form>
+    </div>
+        <div class="col-md-3">
+            <h3> M. Yiğit Şahin</h3>
+
+            <p>
+                Email: demo@bumin.com.tr
+                </p>
+            <p>
+                Password: cjaiU8CV
+            </p>
+            <p>* test email and password reminder</p>
+        </div>
+    </div>
+    <div class="response-output">
+
+    </div>
+</div>
+<script src="js/jquery.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script type="text/javascript">
+    jQuery(document).ready(function() {
+        jQuery(".frm-signin").on("submit", function(e) {
+            e.preventDefault();
+            jQuery.ajax({
+                url : '',
+                method : 'post',
+                data : jQuery(this).serialize()
+            }).done(function(msg) {
+                if (msg.indexOf("success") != -1) {
+                    jQuery(".frm-signin").html(msg);
+                    return;
+                }
+                jQuery(".response-output").html(msg);
+            }).always(function(msg) {
+
+            });
+        });
+    });
+</script>
+</body>
+</html>
